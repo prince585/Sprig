@@ -34,7 +34,7 @@ true
 
 Methods that return primitives (`long`, `int`, `double`, `boolean` and so on) never return `null`, so you can use those results directly.
 
-In the other direction, an argument you pass to Java can never be `null`, even when the parameter type is `Object`. Check a `T?` value before you pass it to Java. Sprig reads nullability annotations that are visible at run time: a result annotated `@NotNull`/`@NonNull` (or declared in a `@NullMarked` class or package) is a plain `T`, and a parameter annotated `@Nullable` accepts a `T?` or `null`. Annotations that live only in class files, like `org.jetbrains.annotations`, aren't visible and don't count.
+In the other direction, an argument you pass to Java can never be `null`, even when the parameter type is `Object`. Check a `T?` value before you pass it to Java. Sprig reads nullability annotations: a result annotated `@NotNull`/`@NonNull` (or declared in a `@NullMarked` class or package) is a plain `T`, and a parameter annotated `@Nullable` accepts a `T?` or `null`. Run-time visible annotations (JSpecify, JSR-305) are read through reflection; annotations that live only in class files, like `org.jetbrains.annotations`, are read from the class file. Minecraft itself is JSpecify-annotated with `@NullMarked` on every package, so `Item.use` or `Component.literal` give you a plain value and only its `@Nullable` members are `T?`.
 
 ## Type mapping
 
@@ -162,7 +162,7 @@ Before writing the file, `wrap` checks the generated code against the same class
 - **Wildcard syntax**: a wildcard-typed value can be held and passed on, but you can't write a wildcard in a Sprig declaration, and nothing can be added through `? extends`. Deeply nested builder APIs such as Brigadier may still want a small Java adapter; see [Fabric mods](/en/guide/fabric).
 - **Varargs of a type variable** (`T...`): there is no element class to pack into.
 - **Generic inference**: write the type arguments yourself; there's no variance either.
-- **Nullability annotations kept only in class files** (`org.jetbrains.annotations`, Android's): not visible at run time, so not read; the run-time visible ones (JSpecify, JSR-305, Checker Framework, Spring) are.
+- **Nullability defaults without annotations**: a library that annotates nothing keeps Sprig's conservative rule, every reference result is `T?`; only annotations (run-time visible or read from the class file) and `@NullMarked`-style defaults change that.
 - **Arithmetic inside Java**: an `int` overflow inside a Java method doesn't raise Sprig's numeric error.
 
 The full list is in [known limitations](/en/reference/language/known-limitations).

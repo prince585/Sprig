@@ -34,7 +34,7 @@ true
 
 返回基本类型（`long`、`int`、`double`、`boolean` 等）的方法不会返回 `null`，结果可以直接用。
 
-反过来，传给 Java 的参数一律不能是 `null`，参数类型是 `Object` 也一样。所以 `T?` 类型的值要先检查，再传给 Java。Sprig 会读取运行时可见的可空性注解：标了 `@NotNull`/`@NonNull`（或者所在类、包标了 `@NullMarked`）的结果就是普通的 `T`，标了 `@Nullable` 的参数接受 `T?` 或 `null`。只保留在 class 文件里的注解（比如 `org.jetbrains.annotations`）运行时看不到，所以不算。
+反过来，传给 Java 的参数一律不能是 `null`，参数类型是 `Object` 也一样。所以 `T?` 类型的值要先检查，再传给 Java。Sprig 会读取可空性注解：标了 `@NotNull`/`@NonNull`（或者所在类、包标了 `@NullMarked`）的结果就是普通的 `T`，标了 `@Nullable` 的参数接受 `T?` 或 `null`。运行时可见的注解（JSpecify、JSR-305）通过反射读，只保留在 class 文件里的注解（比如 `org.jetbrains.annotations`）直接从 class 文件里读。Minecraft 本身用 JSpecify 标注，每个包都有 `@NullMarked`，所以 `Item.use`、`Component.literal` 拿到的就是普通值，只有标了 `@Nullable` 的成员才是 `T?`。
 
 ## 类型对照
 
@@ -162,7 +162,7 @@ sprig wrap com.example.Client --out src/client.spr --classpath lib/client.jar
 - **通配符语法**：带通配符类型的值可以持有和传递，但不能在 Sprig 的声明里写通配符，也不能穿过 `? extends` 往里加元素。像 Brigadier 这样层层嵌套的 builder API 可能仍然需要一个简单的 Java 适配层，见 [Fabric 模组](/guide/fabric)。
 - **元素是类型变量的变长参数**（`T...`）：没有可以打包的元素类。
 - **泛型推断**：类型参数要自己写，也没有协变和逆变。
-- **只保留在 class 文件里的可空性注解**（`org.jetbrains.annotations`、Android 的那套）：运行时看不到，所以不读；运行时可见的（JSpecify、JSR-305、Checker Framework、Spring）会读。
+- **没有注解的库**：什么都不标的库还是按 Sprig 的保守规则，引用结果一律 `T?`；只有注解（运行时可见的或从 class 文件读到的）和 `@NullMarked` 这类默认声明才会改变它。
 - **Java 内部的计算**：Java 方法里发生的 `int` 溢出，不会触发 Sprig 的数值错误。
 
 完整列表见[已知限制（英文）](/en/reference/language/known-limitations)。

@@ -16,9 +16,10 @@ import java.util.Set;
  * or module defaults NullMarked, NonNullApi, MethodsReturnNonnullByDefault
  * and FieldsAreNonnullByDefault, which NullUnmarked cancels. An annotation
  * kept only in class files (CLASS retention, as org.jetbrains.annotations
- * and the Android ones are) cannot be seen by reflection and does not count.
- * Parameters stay non-null unless annotated nullable, whatever the defaults
- * say, because Sprig never hands Java a null it did not ask for.
+ * and the Android ones are) is invisible to reflection, so the declaring
+ * class's file is read as well ({@link ClassFileAnnotations}). Parameters
+ * stay non-null unless annotated nullable, whatever the defaults say,
+ * because Sprig never hands Java a null it did not ask for.
  */
 public final class JvmNullability {
     private static final Set<String> NON_NULL = Set.of("NotNull", "NonNull", "Nonnull");
@@ -36,6 +37,9 @@ public final class JvmNullability {
             return true;
         }
         Boolean explicit = explicit(method, method.getAnnotatedReturnType());
+        if (explicit == null) {
+            explicit = ClassFileAnnotations.of(method.getDeclaringClass()).result(method);
+        }
         return explicit != null ? explicit : defaults(method.getDeclaringClass(), RESULTS_NON_NULL);
     }
 
@@ -45,6 +49,9 @@ public final class JvmNullability {
             return true;
         }
         Boolean explicit = explicit(field, field.getAnnotatedType());
+        if (explicit == null) {
+            explicit = ClassFileAnnotations.of(field.getDeclaringClass()).field(field);
+        }
         return explicit != null ? explicit : defaults(field.getDeclaringClass(), FIELDS_NON_NULL);
     }
 
@@ -58,6 +65,9 @@ public final class JvmNullability {
         AnnotatedType[] typeUse = executable.getAnnotatedParameterTypes();
         Boolean explicit = explicit(index < declared.length ? declared[index] : new Annotation[0],
                 index < typeUse.length ? typeUse[index].getAnnotations() : new Annotation[0]);
+        if (explicit == null) {
+            explicit = ClassFileAnnotations.of(executable.getDeclaringClass()).parameter(executable, index);
+        }
         return explicit != null && !explicit;
     }
 

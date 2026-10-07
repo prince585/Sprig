@@ -62,7 +62,7 @@ public final class JvmMetadata {
                         .thenComparing(Field::toGenericString))
                 .forEach(field -> fields.add(describe(field)));
         out.put("fields", fields);
-        out.put("nullabilityPolicy", "Java reference results are nullable unless a run-time visible annotation declares them non-null (NotNull/NonNull/Nonnull, or NullMarked/NonNullApi/MethodsReturnNonnullByDefault on the class or package) or the method is toString(); parameters require non-null values unless annotated Nullable or CheckForNull; annotations kept only in class files (org.jetbrains.annotations, Android) are not seen");
+        out.put("nullabilityPolicy", "Java reference results are nullable unless a run-time visible annotation declares them non-null (NotNull/NonNull/Nonnull, or NullMarked/NonNullApi/MethodsReturnNonnullByDefault on the class or package) or the method is toString(); parameters require non-null values unless annotated Nullable or CheckForNull; annotations kept only in class files (org.jetbrains.annotations, Android) are read from the class file");
         out.put("interopLevels", List.of(
                 Map.of("level", "direct", "meaning", "no generic or array shape is involved"),
                 Map.of("level", "concrete-generic", "meaning", "every generic argument is concrete and preserved"),

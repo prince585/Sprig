@@ -89,11 +89,15 @@ simple name so every library's spelling counts:
 
 `sprig api` reports the outcome: `nullableResult` is false and
 `sprigReturnType`/`sprigType` drop the `?` for a non-null result or field, and
-`sprigParameterTypes` shows `T?` for a nullable parameter. An annotation kept
-only in class files cannot be seen by reflection and does not count:
-`org.jetbrains.annotations` (which Minecraft and Fabric use) and the Android
-annotations have CLASS retention, while JSpecify, JSR-305 (`javax.annotation`,
-`jakarta.annotation`), the Checker Framework and Spring's are visible.
+`sprigParameterTypes` shows `T?` for a nullable parameter. Annotations with
+RUNTIME retention (JSpecify, JSR-305 `javax.annotation`/`jakarta.annotation`,
+the Checker Framework, Spring) are read through reflection; those kept only in
+class files (CLASS retention: `org.jetbrains.annotations`, the Android and
+Eclipse ones) are read from the declaring class's file, so they count too, even
+when the annotation class is absent from the classpath. Minecraft (Mojang
+mappings) is JSpecify-annotated with `@NullMarked` on every package, so its
+unannotated results and fields are non-null and its `@Nullable` members keep
+`T?`; Fabric Loader uses `org.jetbrains.annotations`.
 
 ## Arrays
 

@@ -58,9 +58,10 @@ by the historical design kit in `docs/history/design-kit/`.
   conservatively nullable and reference parameters non-null, except where a
   nullability annotation visible at run time says otherwise (`NotNull`,
   `NonNull`, `Nonnull`, `Nullable`, `CheckForNull`, and the `NullMarked`,
-  `NonNullApi` and `MethodsReturnNonnullByDefault` defaults); annotations kept
-  only in class files, such as `org.jetbrains.annotations`, are not seen; a
-  `toString()` result is non-null.
+  `NonNullApi` and `MethodsReturnNonnullByDefault` defaults), read through
+  reflection or, for annotations kept only in class files such as
+  `org.jetbrains.annotations`, from the class file; a `toString()` result is
+  non-null.
 - Sprig `throws` and `catch` are implemented, but their relationship to Java
   exception classes and top-level execution remains provisional. Checked Java
   exceptions follow Java's rule in one direction more: a catch nothing can
